@@ -1,5 +1,6 @@
 import prisma from '../db';
 import type { RequestHandler } from 'express';
+import { ErrorMessage } from '../modules/error';
 
 export const getProducts: RequestHandler = async (req, res) => {
   const user = await prisma.user.findUnique({
@@ -37,15 +38,19 @@ export const getProductById: RequestHandler = async (req, res) => {
   res.json({ data: product });
 };
 
-export const createProduct: RequestHandler = async (req, res) => {
-  const product = await prisma.product.create({
-    data: {
-      name: req.body.name as string,
-      belogsToId: res.locals.user.id,
-    },
-  });
+export const createProduct: RequestHandler = async (req, res, next) => {
+  try {
+    const product = await prisma.product.create({
+      data: {
+        name: req.body.name as string,
+        belogsToId: res.locals.user.id,
+      },
+    });
 
-  res.json({ data: product });
+    res.json({ data: product });
+  } catch (err) {
+    next(new ErrorMessage('db', 'databse error', 500));
+  }
 };
 
 export const updateProduct: RequestHandler = async (req, res) => {

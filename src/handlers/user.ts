@@ -1,27 +1,43 @@
 import type { RequestHandler } from 'express';
 import prisma from '../db';
 import { comparePasswords, createJWT, hashPassword } from '../modules/auth';
+import { ErrorMessage } from '../modules/error';
 
-export const createUser: RequestHandler = async (req, res) => {
+export const createUser: RequestHandler = async (req, res, next) => {
   const { username, password } = req.body;
 
-  const existingUser = await prisma.user.findUnique({
-    where: { username },
-  });
+  try {
+    const existingUser = await prisma.user.findUnique({
+      where: { username },
+    });
 
-  if (existingUser) {
-    res.status(409);
-    res.json({ message: 'username already taken' });
+    if (existingUser) {
+      throw new ErrorMessage('input', 'username already taken', 409);
+    }
+
+    const user = await prisma.user.create({
+      data: {
+        username,
+        password: await hashPassword(password),
+      },
+    });
+
+    if (!user) {
+      throw new ErrorMessage('db', 'Database Error', 500);
+    }
+
+    const token = createJWT(user);
+    if (!token) {
+      throw new ErrorMessage(
+        'auth',
+        'something went wrong when creating token',
+        500
+      );
+    }
+    res.json({ token });
+  } catch (err) {
+    next(err);
   }
-
-  const user = await prisma.user.create({
-    data: {
-      username,
-      password: await hashPassword(password),
-    },
-  });
-  const token = createJWT(user);
-  res.json({ token });
 };
 
 export const signIn: RequestHandler = async (req, res) => {

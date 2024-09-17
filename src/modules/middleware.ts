@@ -1,13 +1,11 @@
 import type { RequestHandler } from 'express';
 import { validationResult } from 'express-validator';
+import { ErrorMessage } from './error';
 
-export const handleInputErrors: RequestHandler = (req, res, next) => {
+export const handleInputErrors: RequestHandler = (req, _, next) => {
   const errors = validationResult(req);
-  console.log(errors.array());
   if (!errors.isEmpty()) {
-    res.status(400);
-    res.json({ message: 'Wrong inputs', errors: errors.array() });
-    return;
+    next(new ErrorMessage('input', 'wrong inputs', 400));
   }
   next();
 };
