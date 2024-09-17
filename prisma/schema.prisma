@@ -28,6 +28,8 @@ model Product {
   belogsToId String
   belogsTo   User     @relation(fields: [belogsToId], references: [id])
   updates    Update[]
+
+  @@index([id, belogsToId])
 }
 
 enum UPDATE_STATUS {
@@ -39,7 +41,7 @@ enum UPDATE_STATUS {
 model Update {
   id         String        @id @default(cuid())
   created_at DateTime      @default(now())
-  updated_at DateTime
+  updated_at DateTime      @updatedAt
   title      String
   body       String
   status     UPDATE_STATUS @default(IN_PROGRESS)
@@ -54,7 +56,7 @@ model Update {
 model UpdatePoint {
   id          String   @id @default(cuid())
   created_at  DateTime @default(now())
-  updated_at  DateTime
+  updated_at  DateTime @updatedAt
   name        String   @db.VarChar(255)
   description String
   update_id   String
