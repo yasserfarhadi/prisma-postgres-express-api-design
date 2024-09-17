@@ -1,9 +1,10 @@
 import * as dotenv from 'dotenv';
 import app from './server';
+import config from './config';
 
 dotenv.config();
 
-app.listen(3000, () => console.log('Listening on 3000...'));
+app.listen(config.port, () => console.log(`Listening on ${config.port}...`));
 
 process.on('uncaughtException', (error) => {
   console.log(error.message);
