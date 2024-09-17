@@ -8,6 +8,9 @@ const app = express();
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.get('/', (req, res) => {
+  res.json({ message: 'hello' });
+});
 app.use('/api', protect, router);
 app.post('/user', createUser);
 app.post('/signin', signIn);
