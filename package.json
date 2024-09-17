@@ -4,7 +4,9 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "dev": "nodemon --watch src/** --ext ts,json --ignore src/**/*.test.ts --exec ts-node src/index.ts"
+    "dev": "nodemon --watch src/** --ext ts,json --ignore src/**/*.test.ts --exec ts-node src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js"
   },
   "keywords": [],
   "author": "",
